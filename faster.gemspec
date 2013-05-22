@@ -11,8 +11,11 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'ffaker'
+  s.add_development_dependency 'rake-compiler'
 
   s.required_ruby_version = '>= 1.9.3'
 
-  s.files = Dir['lib/**/*.rb'] + ['LICENSE']
+  s.files = Dir['ext/**/*.{c,rb}'] + Dir['lib/**/*.rb'] + ['LICENSE']
+
+  s.extensions << 'ext/faster/extconf.rb'
 end

@@ -8,6 +8,9 @@ GEM
   specs:
     diff-lcs (1.2.4)
     ffaker (1.16.1)
+    rake (10.0.4)
+    rake-compiler (0.8.3)
+      rake
     rspec (2.13.0)
       rspec-core (~> 2.13.0)
       rspec-expectations (~> 2.13.0)
@@ -23,4 +26,5 @@ PLATFORMS
 DEPENDENCIES
   faster!
   ffaker
+  rake-compiler
   rspec
