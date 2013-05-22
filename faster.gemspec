@@ -17,5 +17,5 @@ Gem::Specification.new do |s|
 
   s.files = Dir['ext/**/*.{c,rb}'] + Dir['lib/**/*.rb'] + ['LICENSE']
 
-  s.extensions << 'ext/faster/extconf.rb'
+  s.extensions << 'ext/faster_mri/extconf.rb'
 end
