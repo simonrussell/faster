@@ -144,9 +144,26 @@ long Array_(binary_search_ge)(Array *array, Item search_value)
   }
 }
 
+void Array_(append)(Array *array, Item item)
+{
+  // resize _might_ fail, and leave it unmodified
+  if (Array_(resize)(array, array->length + 1))
+  {
+    array->items[array->length++] = item;
+  }
+  else
+  {
+    // error
+  }
+}
+
 void Array_(insert)(Array *array, long index, Item item)
 {
-  if (index >= 0 && index <= array->length)
+  if (index == array->length)
+  {
+    Array_(append)(array, item);
+  }
+  else if (index >= 0 && index <= array->length)
   {
     // resize _might_ fail, and leave it unmodified
     if (Array_(resize)(array, array->length + 1))

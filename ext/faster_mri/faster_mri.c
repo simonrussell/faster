@@ -119,22 +119,14 @@ static VALUE Int_last(VALUE self)
   }
 }
 
-static VALUE Int_append(VALUE self, VALUE rbItem)
+static VALUE Int_append(VALUE self, VALUE item)
 {
   LongArray *array;
 
-  Check_Type(rbItem, T_FIXNUM);
   Data_Get_Struct(self, LongArray, array);
+  Check_Type(item, T_FIXNUM);
 
-  // resize _might_ fail, and leave it unmodified
-  if (LongArray_resize(array, array->length + 1))
-  {
-    array->items[array->length++] = NUM2LONG(rbItem);
-  }
-  else
-  {
-    // error
-  }
+  LongArray_append(array, NUM2LONG(item));
 
   return self;
 }
