@@ -1,14 +1,12 @@
-#include "faster_mri.h"
-
 // NOTE: this isn't actually used by the ruby bridge, so deal with stuff being set to zero.
-IntArray *IntArray_new(void)
+Array *Array_(new)(void)
 {
-  IntArray *int_array = ALLOC(IntArray);
-  memset(int_array, 0, sizeof(IntArray));
-  return int_array;
+  Array *array = ALLOC(Array);
+  memset(array, 0, sizeof(Array));
+  return array;
 }
 
-long IntArray_calc_capacity(long desired)
+long Array_(calc_capacity)(long desired)
 {
   if (desired <= 0)
   {
@@ -36,30 +34,30 @@ long IntArray_calc_capacity(long desired)
   }
 }
 
-int IntArray_resize(IntArray *int_array, long new_capacity)
+int Array_(resize)(Array *array, long new_capacity)
 {
-  long *new_items;
+  Item *new_items;
 
-  new_capacity = IntArray_calc_capacity(new_capacity);
+  new_capacity = Array_(calc_capacity)(new_capacity);
 
-  if (new_capacity == int_array->capacity)
+  if (new_capacity == array->capacity)
   {
     /* nothing */
     return 1;
   }
   else if (new_capacity > 0)
   {
-    new_items = int_array->items;
-    REALLOC_N(new_items, long, new_capacity);
+    new_items = array->items;
+    REALLOC_N(new_items, Item, new_capacity);
 
     if (new_items)
     {
-      int_array->items = new_items;
-      int_array->capacity = new_capacity;
+      array->items = new_items;
+      array->capacity = new_capacity;
 
-      if (new_capacity < int_array->length)
+      if (new_capacity < array->length)
       {
-        int_array->length = new_capacity;
+        array->length = new_capacity;
       }
 
       return 1;
@@ -71,17 +69,17 @@ int IntArray_resize(IntArray *int_array, long new_capacity)
   }
   else
   {
-    xfree(int_array->items);
-    int_array->items = NULL;
-    int_array->capacity = int_array->length = 0;
+    xfree(array->items);
+    array->items = NULL;
+    array->capacity = array->length = 0;
     return 1;
   }
 }
 
-void IntArray_delete(IntArray *int_array)
+void Array_(delete)(Array *array)
 {
-  IntArray_resize(int_array, 0);
-  xfree(int_array);
+  Array_(resize)(array, 0);
+  xfree(array);
 }
 
 /*
@@ -108,7 +106,7 @@ void IntArray_delete(IntArray *int_array)
     top_index
 */
 
-long IntArray_binary_search_ge(IntArray *array, long search_value)
+long Array_(binary_search_ge)(Array *array, Item search_value)
 {
   if (array->length == 0)
   {
@@ -126,7 +124,7 @@ long IntArray_binary_search_ge(IntArray *array, long search_value)
     while (top_index > bottom_index)
     {
       long index = (bottom_index + top_index) >> 1;
-      long index_value = array->items[index];
+      Item index_value = array->items[index];
 
       if (index_value == search_value)
       {
