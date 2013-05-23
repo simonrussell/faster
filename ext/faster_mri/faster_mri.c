@@ -35,7 +35,7 @@ static VALUE Int_initialize(VALUE self, VALUE items)
   // copy the items that'll fit
   for (i = 0; i < int_array->length; i++)
   {
-    int_array->items[i] = NUM2INT(RARRAY_PTR(items)[i]);
+    int_array->items[i] = NUM2LONG(RARRAY_PTR(items)[i]);
   }
 
   return self;
@@ -51,7 +51,7 @@ static VALUE Int_initialize_copy(VALUE rbSelf, VALUE rbOld)
   if (IntArray_resize(self, old->length))
   {
     self->length = old->length;
-    memcpy(self->items, old->items, self->length * sizeof(int));
+    memcpy(self->items, old->items, self->length * sizeof(long));
   }
   else
   {
@@ -62,18 +62,18 @@ static VALUE Int_initialize_copy(VALUE rbSelf, VALUE rbOld)
 static VALUE Int_at(VALUE self, VALUE rbIndex)
 {
   IntArray *int_array;
-  int index;
+  long index;
 
   Data_Get_Struct(self, IntArray, int_array);
 
   Check_Type(rbIndex, T_FIXNUM);
-  index = NUM2INT(rbIndex);
+  index = NUM2LONG(rbIndex);
 
   if (index >= 0)
   {
     if (index < int_array->length)
     {
-      return INT2NUM(int_array->items[index]);
+      return LONG2NUM(int_array->items[index]);
     }
     else
     {
@@ -109,7 +109,7 @@ static VALUE Int_last(VALUE self)
 
   if (int_array->length > 0)
   {
-    return INT2NUM(int_array->items[int_array->length - 1]);
+    return LONG2NUM(int_array->items[int_array->length - 1]);
   }
   else
   {
@@ -127,7 +127,7 @@ static VALUE Int_append(VALUE self, VALUE rbItem)
   // resize _might_ fail, and leave it unmodified
   if (IntArray_resize(int_array, int_array->length + 1))
   {
-    int_array->items[int_array->length++] = NUM2INT(rbItem);
+    int_array->items[int_array->length++] = NUM2LONG(rbItem);
   }
   else
   {
@@ -153,9 +153,9 @@ static VALUE Int_insert(VALUE self, VALUE rbIndex, VALUE rbItem)
     // resize _might_ fail, and leave it unmodified
     if (IntArray_resize(int_array, int_array->length + 1))
     {
-      memmove(int_array->items + index + 1, int_array->items + index, (int_array->length - index) * sizeof(int));
+      memmove(int_array->items + index + 1, int_array->items + index, (int_array->length - index) * sizeof(long));
       int_array->length++;
-      int_array->items[index] = NUM2INT(rbItem);
+      int_array->items[index] = NUM2LONG(rbItem);
     }
     else
     {
@@ -180,13 +180,23 @@ static VALUE Int_delete_at(VALUE self, VALUE rbIndex)
   // resize _might_ fail, and leave it unmodified
   if (index >= 0 && index < int_array->length)
   {
-    result = INT2NUM(int_array->items[index]);
-    memmove(int_array->items + index, int_array->items + index + 1, (int_array->length - index - 1) * sizeof(int));
+    result = LONG2NUM(int_array->items[index]);
+    memmove(int_array->items + index, int_array->items + index + 1, (int_array->length - index - 1) * sizeof(long));
     int_array->length--;
     IntArray_resize(int_array, int_array->length);
   }
 
   return result;
+}
+
+static VALUE Int_binary_search_ge(VALUE self, VALUE search_value)
+{
+  IntArray *array;
+
+  Data_Get_Struct(self, IntArray, array);
+  Check_Type(search_value, T_FIXNUM);
+
+  return LONG2NUM(IntArray_binary_search_ge(array, NUM2LONG(search_value)));
 }
 
 static void define_Faster_Array_Int(void)
@@ -204,6 +214,7 @@ static void define_Faster_Array_Int(void)
   rb_define_method(klass, "<<", Int_append, 1);
   rb_define_method(klass, "insert", Int_insert, 2);
   rb_define_method(klass, "delete_at", Int_delete_at, 1);
+  rb_define_method(klass, "binary_search_ge", Int_binary_search_ge, 1);
 }
 
 void Init_faster_mri(void)

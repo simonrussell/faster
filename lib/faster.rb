@@ -11,6 +11,7 @@ class Faster::Array::Int
 
   # TODO in C
   def eql?(other)
+    return true if equal?(other)
     return false unless other.is_a?(self.class) && length == other.length
 
     (0...length).each do |index|
@@ -20,6 +21,7 @@ class Faster::Array::Int
 
   # TODO in C
   def ==(other)
+    return true if eql?(other)
     return false unless length == other.length
 
     (0...length).each do |index|

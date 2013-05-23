@@ -93,11 +93,27 @@ describe Faster::Array do
     context "no items" do
       let(:items) { [] }
       it_should_behave_like "an array"
+
+      describe "#binary_search_ge" do
+        it "should always return zero" do
+          klass.new(items).binary_search_ge(rand(4343)).should == 0
+        end
+      end
     end
 
     context "some items" do
       let(:items) { (0..rand(150..200)).to_a }
       it_should_behave_like "an array"
+
+      describe "#binary_search_ge" do
+        it "should work" do
+          array = klass.new(items)
+
+          array.binary_search_ge(-1).should == 0
+          items.each { |item| array.binary_search_ge(item).should == item }
+          array.binary_search_ge(1000).should == array.length
+        end
+      end
     end
   end
 
