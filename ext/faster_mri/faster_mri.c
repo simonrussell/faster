@@ -57,6 +57,8 @@ static VALUE Int_initialize_copy(VALUE rbSelf, VALUE rbOld)
   {
     // TODO error
   }
+
+  return rbSelf;
 }
 
 static VALUE Int_at(VALUE self, VALUE rbIndex)
@@ -137,31 +139,15 @@ static VALUE Int_append(VALUE self, VALUE rbItem)
   return self;
 }
 
-static VALUE Int_insert(VALUE self, VALUE rbIndex, VALUE rbItem)
+static VALUE Int_insert(VALUE self, VALUE index, VALUE item)
 {
   LongArray *array;
-  long index;
 
   Data_Get_Struct(self, LongArray, array);
-  Check_Type(rbItem, T_FIXNUM);
-  Check_Type(rbIndex, T_FIXNUM);
+  Check_Type(item, T_FIXNUM);
+  Check_Type(index, T_FIXNUM);
 
-  index = NUM2LONG(rbIndex);
-
-  if (index >= 0 && index <= array->length)
-  {
-    // resize _might_ fail, and leave it unmodified
-    if (LongArray_resize(array, array->length + 1))
-    {
-      memmove(array->items + index + 1, array->items + index, (array->length - index) * sizeof(long));
-      array->length++;
-      array->items[index] = NUM2LONG(rbItem);
-    }
-    else
-    {
-      // error
-    }
-  }
+  LongArray_insert(array, NUM2LONG(index), NUM2LONG(item));
 
   return self;
 }
