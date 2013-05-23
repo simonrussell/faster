@@ -99,7 +99,7 @@ static VALUE Int_empty(VALUE self)
   IntArray *int_array;
   Data_Get_Struct(self, IntArray, int_array);
 
-  return int_array->length > 0 ? Qtrue : Qfalse;
+  return int_array->length > 0 ? Qfalse : Qtrue;
 }
 
 static VALUE Int_last(VALUE self)
@@ -148,16 +148,19 @@ static VALUE Int_insert(VALUE self, VALUE rbIndex, VALUE rbItem)
 
   index = NUM2LONG(rbIndex);
 
-  // resize _might_ fail, and leave it unmodified
-  if (IntArray_resize(int_array, int_array->length + 1))
+  if (index >= 0 && index <= int_array->length)
   {
-    memmove(int_array->items + index + 1, int_array->items + index, (int_array->length - index) * sizeof(int));
-    int_array->length++;
-    int_array->items[index] = NUM2INT(rbItem);
-  }
-  else
-  {
-    // error
+    // resize _might_ fail, and leave it unmodified
+    if (IntArray_resize(int_array, int_array->length + 1))
+    {
+      memmove(int_array->items + index + 1, int_array->items + index, (int_array->length - index) * sizeof(int));
+      int_array->length++;
+      int_array->items[index] = NUM2INT(rbItem);
+    }
+    else
+    {
+      // error
+    }
   }
 
   return self;
@@ -181,10 +184,6 @@ static VALUE Int_delete_at(VALUE self, VALUE rbIndex)
     memmove(int_array->items + index, int_array->items + index + 1, (int_array->length - index - 1) * sizeof(int));
     int_array->length--;
     IntArray_resize(int_array, int_array->length);
-  }
-  else
-  {
-    // error
   }
 
   return result;
