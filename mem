@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+require 'benchmark'
+require File.expand_path('../lib/faster', __FILE__)
+
+klass = ARGV.delete('--faster') ? Faster::Array::Int : Array
+arrays = []
+
+Benchmark.bmbm do |x|
+  x.report do
+    10.times do
+      array = klass.new([])
+      arrays << array
+      10_000_000.times do |i|
+        array << i
+      end
+    end
+  end
+end
+
+gets if ARGV.delete('--wait')

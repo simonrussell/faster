@@ -1,105 +1,12 @@
-#include <ruby.h>
+#include "faster_mri.h"
 
 VALUE Faster = Qnil;
 VALUE Faster_Array = Qnil;
 
-typedef struct
-{
-  long capacity;
-  long length;
-  int *items;
-} IntArray;
-
-static IntArray *IntArray_new(void)
-{
-  IntArray *int_array = malloc(sizeof(IntArray));
-
-  int_array->items = NULL;
-  int_array->capacity = int_array->length = 0;
-
-  return int_array;
-}
-
-static long IntArray_calc_capacity(long desired)
-{
-  if (desired <= 0)
-  {
-    return 0;
-  }
-  else if (desired < 512)
-  {
-    return 512;
-  }
-  else if (desired < 4096)
-  {
-    return 4096;
-  }
-  else if (desired < 32768)
-  {
-    return 32768;
-  }
-  else if (desired < 65536)
-  {
-    return 65536;
-  }
-  else
-  {
-    return (desired | 65535) + 1;
-  }
-}
-
-static int IntArray_resize(IntArray *int_array, long new_capacity)
-{
-  int *new_items;
-
-  new_capacity = IntArray_calc_capacity(new_capacity);
-
-  if (new_capacity == int_array->capacity)
-  {
-    /* nothing */
-    return 1;
-  }
-  else if (new_capacity > 0)
-  {
-    new_items = realloc(int_array->items, sizeof(int) * new_capacity);
-
-    if (new_items)
-    {
-      int_array->items = new_items;
-      int_array->capacity = new_capacity;
-
-      if (new_capacity < int_array->length)
-      {
-        int_array->length = new_capacity;
-      }
-
-      return 1;
-    }
-    else
-    {
-      return 0;
-    }
-  }
-  else
-  {
-    free(int_array->items);
-    int_array->items = NULL;
-    int_array->capacity = int_array->length = 0;
-    return 1;
-  }
-}
-
-static void IntArray_delete(IntArray *int_array)
-{
-  IntArray_resize(int_array, 0);
-  free(int_array);
-}
-
 static VALUE Int_allocate(VALUE klass)
 {
-  IntArray *int_array = IntArray_new();
-
-  return Data_Wrap_Struct(klass, NULL, IntArray_delete, int_array);
+  IntArray *int_array;
+  return Data_Make_Struct(klass, IntArray, NULL, IntArray_delete, int_array);
 }
 
 static VALUE Int_initialize(VALUE self, VALUE items)
