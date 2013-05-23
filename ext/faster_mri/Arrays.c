@@ -7,3 +7,11 @@
 #undef Array
 #undef Array_
 #undef Item
+
+#define Array DoubleArray
+#define Array_(x) DoubleArray_##x
+#define Item double
+#include "Array_defs.h"
+#undef Array
+#undef Array_
+#undef Item
